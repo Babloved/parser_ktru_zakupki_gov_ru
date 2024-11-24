@@ -4,8 +4,10 @@ import requests
 import tqdm
 import time
 import re
-import win32clipboard
+
+import clipboard
 import keyboard
+
 
 from bs4 import BeautifulSoup
 
@@ -37,12 +39,11 @@ print(Back.WHITE + Fore.BLACK + "                      ПАРСЕР КТРУ V0.
 
 print(Fore.LIGHTWHITE_EX + "Чтобы считать характеристики из буфера обмена нажмите Space" + Style.RESET_ALL)
 keyboard.wait('space')  # Wait
-win32clipboard.OpenClipboard()
-clipboard = win32clipboard.GetClipboardData()
+
+clipboard = clipboard.paste()
 # clipboard = "Количество LAN портов	Больше или равно 49	Шт\nСхема резервирования коммутационной матрицы N+2	Да	\nПоддержка горячей замены блоков питания	Да	\nИнтерфейс LAN-порта	XFP\n	Интерфейс LAN-порта	QSFP\n	Время задержки на коммутации, мкс	Меньше или равно 520	\n"
 clipboard = clipboard.replace("Больше или равно ", '≥').replace("Меньше или равно ", '≤').replace("Больше ", '>').replace("Меньше ", '<')
 print("Считываю буфер")
-win32clipboard.CloseClipboard()
 
 clip_reg_data = re.findall(r'([^\t\r\n]+|\n)', clipboard)
 dict_data = {}
