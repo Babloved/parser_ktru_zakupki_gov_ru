@@ -40,9 +40,7 @@ keyboard.wait('space')  # Wait
 win32clipboard.OpenClipboard()
 clipboard = win32clipboard.GetClipboardData()
 # clipboard = "Количество LAN портов	Больше или равно 49	Шт\nСхема резервирования коммутационной матрицы N+2	Да	\nПоддержка горячей замены блоков питания	Да	\nИнтерфейс LAN-порта	XFP\n	Интерфейс LAN-порта	QSFP\n	Время задержки на коммутации, мкс	Меньше или равно 520	\n"
-clipboard = clipboard.replace("Больше или равно ", '≥').replace("Меньше или равно ", '≤').replace("Больше ",
-                                                                                                  '>').replace(
-    "Меньше ", '<')
+clipboard = clipboard.replace("Больше или равно ", '≥').replace("Меньше или равно ", '≤').replace("Больше ", '>').replace("Меньше ", '<')
 print("Считываю буфер")
 win32clipboard.CloseClipboard()
 
@@ -151,6 +149,6 @@ except requests.exceptions.ConnectionError as e:
     keyboard.wait('enter')  # Wait
     sys.exit()
 
-# except Exception as e:
-#     print(Fore.LIGHTRED_EX + f"Что-то пошло не так => {e}" + Style.RESET_ALL)
-#     keyboard.wait('enter')  # Wait
+except Exception as e:
+    print(Fore.LIGHTRED_EX + f"Что-то пошло не так => {e}" + Style.RESET_ALL)
+    keyboard.wait('enter')  # Wait
