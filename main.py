@@ -8,7 +8,6 @@ import re
 import clipboard
 import keyboard
 
-
 from bs4 import BeautifulSoup
 
 from colorama import init
