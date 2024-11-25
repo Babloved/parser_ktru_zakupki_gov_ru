@@ -44,6 +44,7 @@ while (restart == True):
         print("Считываю буфер")
 
         clip_reg_data = re.findall(r'([^\t\r\n]*[^\s]|\n)', str_clipboard)
+        clip_reg_data = [j.strip(' ') for j in clip_reg_data]
         dict_data = {}
         print("Обрабатываю данные с буфера")
         read_bar_format = "%s{l_bar}%s{bar}%s{r_bar}" % (
