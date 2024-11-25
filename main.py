@@ -26,7 +26,7 @@ def CheckStatusRequst(response):
     if response.status_code == 404:
         print('Сайт вернул 404, шаласть не удалась :(')
         print(gov_address)
-        keyboard.wait('enter')  # Wait
+        keyboard.wait('ctrl+enter')  # Wait
         sys.exit()
 
 
@@ -41,10 +41,10 @@ keyboard.wait('space')  # Wait
 
 clipboard = clipboard.paste()
 # clipboard = "Количество LAN портов	Больше или равно 49	Шт\nСхема резервирования коммутационной матрицы N+2	Да	\nПоддержка горячей замены блоков питания	Да	\nИнтерфейс LAN-порта	XFP\n	Интерфейс LAN-порта	QSFP\n	Время задержки на коммутации, мкс	Меньше или равно 520	\n"
-clipboard = clipboard.replace("Больше или равно ", '≥').replace("Меньше или равно ", '≤').replace("Больше ", '>').replace("Меньше ", '<')
+clipboard = clipboard.replace("Больше или равно", '≥').replace("Меньше или равно", '≤').replace("Больше", '>').replace("Меньше", '<').replace(' ',' ')
 print("Считываю буфер")
 
-clip_reg_data = re.findall(r'([^\t\r\n]+|\n)', clipboard)
+clip_reg_data = re.findall(r'([^\t\r\n]*[^\s]|\n)', clipboard)
 dict_data = {}
 print("Обрабатываю данные с буфера")
 read_bar_format = "%s{l_bar}%s{bar}%s{r_bar}" % (
@@ -57,12 +57,20 @@ for i in tqdm.tqdm(range(0, clip_reg_data.__len__()), bar_format=read_bar_format
     if clip_reg_data[i] == '\n':
         idx += 1
         continue
-    if i + 2 < clip_reg_data.__len__() and clip_reg_data[i + 2] != '\n':
-        dict_data[(clip_reg_data[i], clip_reg_data[i + 1].replace(' ', ''))] = (False, clip_reg_data[i + 2])
-        idx += 3
+    if clip_reg_data[i] == '\n' or clip_reg_data[i + 1] == '\n':
+        dict_data[(clip_reg_data[i], clip_reg_data[i + 1])] = (False, '')
+        print(Fore.RED + f'Что-то пустое или характеристика:"{clip_reg_data[i]}" или заначение:"{clip_reg_data[i + 1]}"' + Style.RESET_ALL)
+        print(Fore.RED + f'Возможно непредсказуемое поведение, лучше исправить опечатку, строка: {len(dict_data)}' + Style.RESET_ALL)
+        while clip_reg_data[idx] != '\n':
+            idx+=1
     else:
-        dict_data[(clip_reg_data[i], clip_reg_data[i + 1].replace(' ', ''))] = (False, r"")
-        idx += 2
+
+        if i + 2 < clip_reg_data.__len__() and clip_reg_data[i + 2] != '\n':
+            dict_data[(clip_reg_data[i], clip_reg_data[i + 1])] = (False, clip_reg_data[i + 2])
+            idx += 3
+        else:
+            dict_data[(clip_reg_data[i], clip_reg_data[i + 1])] = (False, '')
+            idx += 2
 
 # Парсим ID КТРУ
 time.sleep(0.5)
@@ -102,7 +110,7 @@ try:
         for cell in cells:
             if (cell.has_attr('rowspan')):
                 if next_cell_type == False:
-                    cell_name = re.sub(r"(?m)^\s+", "", cell.get_text(strip=True))
+                    cell_name = re.sub(r"(?m)^\s+", "", cell.get_text(strip=True)).replace('\n',' ')
                     print(f"Характеристика: {cell_name}")
                     next_cell_type = True;
                     cur_rowspawn = int(cell['rowspan'])
@@ -110,10 +118,14 @@ try:
                     next_cell_type = False;
             else:
                 if next_cell_measur == False:
-                    val = re.sub(r"(?m)^\s+", "", cell.get_text(strip=True)).replace("\n", "")
+                    val = re.sub(r"(?m)^\s+", "", cell.get_text(strip=True)).replace('\n',' ')
+                    val = re.sub(r"≥+(?=\d)", "≥ ", val)
+                    val = re.sub(r">+(?=\d)", "> ", val)
+                    val = re.sub(r"(?<=\d|[a-z])≤", " ≤", val)
+                    val = re.sub(r"(?<=\d|[a-z])<", " <", val)
                     next_cell_measur = True
                 else:
-                    measur = re.sub(r"(?m)^\s+", "", cell.get_text(strip=True)).replace("\n", "")
+                    measur = re.sub(r"(?m)^\s+", "", cell.get_text(strip=True)).replace('\n',' ')
                     if (cell_name, val) in dict_data:
                         measur_er = ""
                         print(Fore.LIGHTGREEN_EX + " =>   " + val + " " + measur + Style.RESET_ALL, end='')
@@ -141,14 +153,14 @@ try:
         else:
             print(Fore.LIGHTRED_EX + f"ОШИБКА => {key[0]} {key[1]}" + Style.RESET_ALL)
 
-    keyboard.wait('enter')  # Wait
+    keyboard.wait('ctrl+enter')  # Wait
     sys.exit()
 except requests.exceptions.ConnectionError as e:
     print(Fore.RED, Style.BRIGHT, 'Невозможно установить соединение с сайтом')
     print(gov_address)
-    keyboard.wait('enter')  # Wait
+    keyboard.wait('ctrl+enter')  # Wait
     sys.exit()
 
 except Exception as e:
     print(Fore.LIGHTRED_EX + f"Что-то пошло не так => {e}" + Style.RESET_ALL)
-    keyboard.wait('enter')  # Wait
+    keyboard.wait('ctrl+enter')  # Wait
