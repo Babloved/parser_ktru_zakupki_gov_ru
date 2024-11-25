@@ -33,7 +33,7 @@ restart = True
 while (restart == True):
     ######### Основной код #########
 
-    print(Back.WHITE + Fore.BLACK + "                      ПАРСЕР КТРУ V0.1                     " + Style.RESET_ALL)
+    print(Back.WHITE + Fore.BLACK + "                      ПАРСЕР КТРУ V0.2                     " + Style.RESET_ALL)
 
     print(Fore.LIGHTWHITE_EX + "Чтобы считать характеристики из буфера обмена нажмите Space" + Style.RESET_ALL)
     keyboard.wait('space')  # Wait
