@@ -4,6 +4,7 @@ import requests
 import tqdm
 import time
 import re
+from os import system
 
 import clipboard
 import keyboard
@@ -26,7 +27,19 @@ def CheckStatusRequst(response):
     if response.status_code == 404:
         print('Сайт вернул 404, шаласть не удалась :(')
         print(gov_address)
-        keyboard.wait('ctrl+enter')  # Wait
+        RestartOrExit()
+
+
+def RestartOrExit():
+    input_str  = ''
+    while input_str != 'y' and input_str != 'n':
+        print("Для перезапуска нажмите y для выхода n")
+        input_str = input()
+        input_str = input_str.replace(' ','')
+    if input_str == 'y':
+        print('Restarting script...')
+        system("python main.py")
+    else:
         sys.exit()
 
 
@@ -37,37 +50,45 @@ print(Back.WHITE + Fore.BLACK + "                      ПАРСЕР КТРУ V0.
 print(Fore.LIGHTWHITE_EX + "Чтобы считать характеристики из буфера обмена нажмите Space" + Style.RESET_ALL)
 keyboard.wait('space')  # Wait
 
-clipboard = clipboard.paste()
-clipboard = clipboard.replace("Больше или равно", '≥').replace("Меньше или равно", '≤').replace("Больше", '>').replace("Меньше", '<').replace(' ', ' ')
-print("Считываю буфер")
 
-clip_reg_data = re.findall(r'([^\t\r\n]*[^\s]|\n)', clipboard)
-dict_data = {}
-print("Обрабатываю данные с буфера")
-read_bar_format = "%s{l_bar}%s{bar}%s{r_bar}" % (
-    "\033[0;32m", "\033[0;32m", "\033[0;32m"
-)
-idx = 0
-for i in tqdm.tqdm(range(0, clip_reg_data.__len__()), bar_format=read_bar_format):
-    if idx and i < idx:
-        continue
-    if clip_reg_data[i] == '\n':
-        idx += 1
-        continue
-    if clip_reg_data[i] == '\n' or clip_reg_data[i + 1] == '\n':
-        dict_data[(clip_reg_data[i], clip_reg_data[i + 1])] = (False, '')
-        print(Fore.RED + f'Что-то пустое или характеристика:"{clip_reg_data[i]}" или заначение:"{clip_reg_data[i + 1]}"' + Style.RESET_ALL)
-        print(Fore.RED + f'Возможно непредсказуемое поведение, лучше исправить опечатку, строка: {len(dict_data)}' + Style.RESET_ALL)
-        while clip_reg_data[idx] != '\n':
+
+try:
+    clipboard = clipboard.paste()
+    clipboard = clipboard.replace("Больше или равно", '≥').replace("Меньше или равно", '≤').replace("Больше", '>').replace("Меньше", '<').replace(' ', ' ')
+    print("Считываю буфер")
+
+    clip_reg_data = re.findall(r'([^\t\r\n]*[^\s]|\n)', clipboard)
+    dict_data = {}
+    print("Обрабатываю данные с буфера")
+    read_bar_format = "%s{l_bar}%s{bar}%s{r_bar}" % (
+        "\033[0;32m", "\033[0;32m", "\033[0;32m"
+    )
+    idx = 0
+    for i in tqdm.tqdm(range(0, clip_reg_data.__len__()), bar_format=read_bar_format):
+        if idx and i < idx:
+            continue
+        if clip_reg_data[i] == '\n':
             idx += 1
-    else:
-
-        if i + 2 < clip_reg_data.__len__() and clip_reg_data[i + 2] != '\n':
-            dict_data[(clip_reg_data[i], clip_reg_data[i + 1])] = (False, clip_reg_data[i + 2])
-            idx += 3
-        else:
+            continue
+        if clip_reg_data[i] == '\n' or clip_reg_data[i + 1] == '\n':
             dict_data[(clip_reg_data[i], clip_reg_data[i + 1])] = (False, '')
-            idx += 2
+            print(Fore.RED + f'Что-то пустое или характеристика:"{clip_reg_data[i]}" или заначение:"{clip_reg_data[i + 1]}"' + Style.RESET_ALL)
+            print(Fore.RED + f'Возможно непредсказуемое поведение, лучше исправить опечатку, строка: {len(dict_data)}' + Style.RESET_ALL)
+            while clip_reg_data[idx] != '\n':
+                idx += 1
+        else:
+
+            if i + 2 < clip_reg_data.__len__() and clip_reg_data[i + 2] != '\n':
+                dict_data[(clip_reg_data[i], clip_reg_data[i + 1])] = (False, clip_reg_data[i + 2])
+                idx += 3
+            else:
+                dict_data[(clip_reg_data[i], clip_reg_data[i + 1])] = (False, '')
+                idx += 2
+except Exception as e:
+    time.sleep(1)
+    print(Fore.LIGHTRED_EX + f"Что-то пошло не так, скорее всего ваш буфер пуст => {e}" + Style.RESET_ALL)
+    RestartOrExit()
+
 
 # Парсим ID КТРУ
 time.sleep(0.5)
@@ -155,9 +176,9 @@ try:
 except requests.exceptions.ConnectionError as e:
     print(Fore.RED, Style.BRIGHT, 'Невозможно установить соединение с сайтом')
     print(gov_address)
-    keyboard.wait('ctrl+enter')  # Wait
-    sys.exit()
+
 
 except Exception as e:
     print(Fore.LIGHTRED_EX + f"Что-то пошло не так => {e}" + Style.RESET_ALL)
-    keyboard.wait('ctrl+enter')  # Wait
+
+RestartOrExit()
