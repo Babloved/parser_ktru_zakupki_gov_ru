@@ -58,7 +58,7 @@ while (restart == True):
                 continue
             if clip_reg_data[i] == '\n' or clip_reg_data[i + 1] == '\n':
                 dict_data[(clip_reg_data[i], clip_reg_data[i + 1])] = (False, '')
-                print(Fore.RED + f'ХАРАКТЕРИСТИКА:"{clip_reg_data[i]}" ИЛИ ЗНАЧЕНИЕ:"{clip_reg_data[i + 1]}" ПУСТОЕ, ЭТО ОШИБКА"' + Style.RESET_ALL)
+                print(Fore.RED + f'ХАРАКТЕРИСТИКА:"{clip_reg_data[i]}" ИЛИ ЗНАЧЕНИЕ:"{clip_reg_data[i + 1]}" ПУСТОЕ, ЭТО ОШИБКА!' + Style.RESET_ALL)
                 print(Fore.RED + f'Возможно непредсказуемое поведение, лучше исправить опечатку, строка: {len(dict_data)}' + Style.RESET_ALL)
                 while clip_reg_data[idx] != '\n':
                     idx += 1
